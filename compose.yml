@@ -1,0 +1,50 @@
+services:
+  db:
+    image: docker.io/library/mariadb:lts
+    env_file: .env
+    environment:
+      - MARIADB_DATABASE=thermhack
+      - MARIADB_USER=user
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_RANDOM_ROOT_PASSWORD=1
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    volumes:
+      - ./db-data:/var/lib/mysql
+    networks:
+      - db
+      - common
+
+  app:
+    build:
+      context: app
+      dockerfile: Containerfile
+    env_file: .env
+    restart: always
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - MARIADB_DATABASE=thermhack
+      - MARIADB_USER=user
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - INIT_SECRET=CHANGE_ME_NOW #REMOVE
+    networks:
+      - db
+      - common
+    depends_on:
+      db:
+        condition: service_healthy
+    ports: #REMOVE
+      - 8000:8000
+    volumes: #REMOVE
+      - ./app/code:/code
+
+  # wsgi
+
+networks:
+  db:
+  common:

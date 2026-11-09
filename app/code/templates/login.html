@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="menu show position-static" style="--bs-menu-min-width: 300px;">
+    <form class="d-flex flex-column gap-3 p-3" method="POST">
+        <label for="token" class="form-label">Enter your token here</label>
+        <input type="password" class="form-control" id="token" name="token" placeholder="Token" required autofocus>
+    </form>
+</div>
+{% endblock %}

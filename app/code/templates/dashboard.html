@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <!-- Controler -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">Thermostat</div>
+            <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                <h3>
+                    <span id="therm_status_txt">fetching status...</span>
+                    <span id="therm_status_ico">⏳</span>
+                </h3>
+                <div class="d-grid gap-3 w-75 mt-4">
+                    <button id="therm_status_btn" class="btn btn-lg">⏳</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Motor Log -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <span>Last logs</span>
+            </div>
+            <div class="card-body p-0" style="overflow-y: auto;">
+                <table id="motor_logs" class="table table-striped table-hover mb-0 small">
+                    <thead class="table-dark sticky-top">
+                        <tr>
+                            <th>Date</th>
+                            <th>Action</th>
+                            <th>Statut</th>
+                            <th>IP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="motor_logs_fetching_row">
+                            <td colspan="5" class="text-center text-muted">fetching last logs...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="{{ url_for(" static", filename="js/dashboard.js" )}}"></script>
+
+{% endblock %}

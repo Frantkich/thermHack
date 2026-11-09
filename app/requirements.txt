@@ -1,0 +1,5 @@
+Flask==3.*
+flask-talisman==1.*
+Flask-Limiter==4.*
+Flask-SQLAlchemy==3.*
+PyMySQL==1.*
