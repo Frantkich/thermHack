@@ -1,6 +1,6 @@
 # Todo
 
-- automate
+- automate planning
 - GPIO logic
 
 - token error - login page
