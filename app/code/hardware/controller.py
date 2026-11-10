@@ -1,7 +1,7 @@
 from logging import log, DEBUG
 
 from db.helpers import write_log
-from app.code.hardware import relay
+from hardware import relay
 
 
 def thermostat_status():

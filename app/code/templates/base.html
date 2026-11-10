@@ -5,15 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThermHack</title>
-    <link rel="icon" type="image/x-icon" href="{{ url_for(" static", filename="images/favicon.ico" )}}">
-    <link href="{{ url_for(" static", filename="libs/bootstrap.min.css" )}}" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link href="{{ url_for('static', filename='libs/bootstrap.min.css' )}}" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
 </head>
 
 <body>
     <div class="container mt-5">
         {% block content %}{% endblock %}
     </div>
-    <script type="module" src="{{ url_for(" static", filename="libs/bootstrap.bundle.min.js" )}}" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
+    <script type="module" src="{{ url_for('static', filename='libs/bootstrap.bundle.min.js' )}}" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
 </body>
 
 </html>
