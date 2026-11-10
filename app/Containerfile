@@ -1,16 +1,16 @@
 FROM docker.io/library/python:3-alpine
 
+RUN pip install --upgrade pip
+
 WORKDIR /code
+
 COPY requirements.txt /code
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install -r requirements.txt
 
 COPY code .
 
-ENV FLASK_RUN_PORT 8000
-ENV FLASK_RUN_HOST 0.0.0.0
-
 EXPOSE 8000
 
-# REMOVE --debug
-CMD ["flask", "run", "--debug"]
+# REMOVE --reload
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:8000", "app:app", "--reload"]
