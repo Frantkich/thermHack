@@ -10,6 +10,13 @@
 </head>
 
 <body>
+    {% for message in get_flashed_messages(with_categories=true) %}
+    {% if message[0] == "warning" %}
+    <div class="alert theme-warning">{{ message[1] }}</div>
+    {% else %}
+    <div class="alert theme-info">{{ message[1] }}</div>
+    {% endif %}
+    {% endfor %}
     <div class="container mt-5">
         {% block content %}{% endblock %}
     </div>

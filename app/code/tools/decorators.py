@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import request, redirect, url_for, flash
+from flask import request, redirect, url_for
 
 from tools.token import check_token_valid
 
@@ -11,8 +11,6 @@ def token_required(f):
         if not token:
             return redirect(url_for("frontend.login"))
 
-
-    
         if not check_token_valid(token):
             return redirect(url_for("frontend.logout"))
             

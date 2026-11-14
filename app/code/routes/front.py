@@ -26,7 +26,7 @@ def login():
     if request.method == "POST":
         provided_token = request.form.get("token")
         if not provided_token:
-            flash("Token missing !", "danger")
+            flash("Token missing !", "error")
             return render_template("login.html")
         
         if check_token_valid(provided_token):
@@ -36,12 +36,11 @@ def login():
                 provided_token, 
                 httponly=True, 
                 secure=True, 
-                samesite="Strict", 
-                max_age=604800 # 7d
+                samesite="Strict"
             )
             return resp
         else:
-            flash("Invalid token", "danger")
+            flash("Invalid token", "warning")
     return render_template("login.html")
 
 @front_bp.route("/logout")

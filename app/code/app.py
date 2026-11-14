@@ -21,7 +21,10 @@ Talisman(app, force_https=False, content_security_policy=csp)
 db.init_app(app)
 
 logger = getLogger(__name__)
-basicConfig(level=DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+basicConfig(
+    level=DEBUG,
+    format="%(asctime)s [%(process)d] [%(levelname)s] %(message)s",
+    datefmt="[%Y-%m-%d %H:%M:%S %z]")
 
 app.register_blueprint(front_bp)
 app.register_blueprint(back_bp)
