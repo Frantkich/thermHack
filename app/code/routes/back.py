@@ -1,8 +1,10 @@
 from flask import Blueprint, request, jsonify
+from datetime import datetime, timedelta
 
 from db.helpers import get_recent_logs
 from tools.decorators import token_required
-from hardware.controller import thermostat_status, thermostat_controller
+from tasks.helpers import create_thermostat_task
+from hardware.helpers import thermostat_status, thermostat_controller
 
 
 back_bp = Blueprint("backend", __name__, url_prefix="/api")
@@ -55,3 +57,11 @@ def getActionLogs():
         msg = str(e)
         resp_code = 500
         return jsonify({"status": status, "message": msg}), resp_code
+
+
+@back_bp.route("/task", methods=["POST"])
+@token_required
+def add_task():
+    alarm_time = datetime.now() + timedelta(seconds=2)
+    create_thermostat_task("on", alarm_time)
+    return "okay", 200

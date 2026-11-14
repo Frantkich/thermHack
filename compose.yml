@@ -31,6 +31,7 @@ services:
       - MARIADB_DATABASE=thermhack
       - MARIADB_USER=user
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - TZ=Europe/Paris
       - INIT_SECRET=CHANGE_ME_NOW #REMOVE
     networks:
       - db
@@ -42,8 +43,6 @@ services:
       - 8000:8000
     volumes: #REMOVE
       - ./app/code:/code
-
-  # wsgi
 
 networks:
   db:

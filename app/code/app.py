@@ -4,6 +4,7 @@ from flask_talisman import Talisman
 
 from config import Config
 from db.db import db
+from tasks.task import scheduler
 
 from routes.front import front_bp, limiter
 from routes.back import back_bp
@@ -24,6 +25,8 @@ basicConfig(level=DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
 app.register_blueprint(front_bp)
 app.register_blueprint(back_bp)
+
+scheduler.start()
 
 with app.app_context():
     db.create_all()
