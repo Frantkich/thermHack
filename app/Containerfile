@@ -12,5 +12,5 @@ COPY code .
 
 EXPOSE 8000
 
-# REMOVE --reload
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:8000", "app:app", "--reload"]
+CMD ["flask", "run", "--debug", "-h", "0.0.0.0", "-p", "8000"]
+# CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:8000", "app:app"]

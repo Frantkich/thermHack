@@ -17,5 +17,5 @@ def write_log(action:str, status:int, msg:str=None):
     db.session.add(log_entry)
     return db.session.commit()
 
-def get_recent_logs(limit) -> list[Log]:
+def get_logs(limit) -> list[Log]:
     return Log.query.order_by(Log.timestamp.desc()).limit(limit).all()

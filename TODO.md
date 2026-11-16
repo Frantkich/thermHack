@@ -1,6 +1,8 @@
 # Todo
 
 - automate planning
+- check status before operate
+
 - GPIO logic
 
 - <https://github.com/agronholm/apscheduler/tree/master/examples/separate_worker>

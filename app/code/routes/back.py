@@ -1,19 +1,19 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime, timedelta
 
-from db.helpers import get_recent_logs
+from db import helpers as db_helpers
+from tasks import helpers as tasks_helpers
+from hardware import helpers as hw_helpers
 from tools.decorators import token_required
-from tasks.helpers import create_thermostat_task
-from hardware.helpers import thermostat_status, thermostat_controller
 
 
 back_bp = Blueprint("backend", __name__, url_prefix="/api")
 
 @back_bp.route("/thermostat", methods=["GET"])
 @token_required
-def getThermostatStatus():
+def thermostat_status():
     try:
-        status, msg = thermostat_status()
+        status, msg = hw_helpers.thermostat_status()
         resp_code = 200
     except Exception as e:
         status = "failed"
@@ -29,7 +29,7 @@ def operateThermostat(action):
         msg = "Action invalid"
         resp_code = 400
     try:
-        status, msg = thermostat_controller(action)
+        status, msg = hw_helpers.thermostat_controller(action)
         resp_code = 200
     except Exception as e:
         status = "failed"
@@ -37,17 +37,17 @@ def operateThermostat(action):
         resp_code = 500
     return jsonify({"status": status, "message": msg}), resp_code
 
-@back_bp.route("/actions", methods=["GET"])
+@back_bp.route("/actionslogs", methods=["GET"])
 @token_required
-def getActionLogs():
+def get_action_logs():
     count = request.args.get("count") if "count" in request.args else 10
     try:
         action_logs = [{
-            "timestamp": al.timestamp,
-            "status": al.status,
-            "ip_address": al.ip_address, 
-            "action": al.action
-        } for al in get_recent_logs(count)]
+            "timestamp": logs.timestamp,
+            "status": logs.status,
+            "ip_address": logs.ip_address, 
+            "action": logs.action
+        } for logs in db_helpers.get_logs(count)]
         status = "sucess"
         resp_code = 200
         return jsonify({"status": status, "data": action_logs}), resp_code
@@ -59,9 +59,24 @@ def getActionLogs():
         return jsonify({"status": status, "message": msg}), resp_code
 
 
-@back_bp.route("/task", methods=["POST"])
+@back_bp.route("/tasks", methods=["GET"])
+@token_required
+def get_tasks():
+    return jsonify({
+        "status": "sucess",
+        "data": [{
+            "id": task["id"],
+            "name": task["name"],
+            "day": f"{task["date"].strftime('%a')} {task["date"].day}/{task["date"].month}",
+            "execution": f"{task["date"].hour}:{task["date"].minute}"
+        } for task in tasks_helpers.get_tasks()]
+    }), 200
+
+
+# REMOVE
+@back_bp.route("/tasks", methods=["POST"])
 @token_required
 def add_task():
-    alarm_time = datetime.now() + timedelta(seconds=2)
-    create_thermostat_task("on", alarm_time)
+    alarm_time = datetime.now() + timedelta(seconds=3600)
+    tasks_helpers.add_task("off", alarm_time)
     return "okay", 200
