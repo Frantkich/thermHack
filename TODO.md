@@ -1,6 +1,9 @@
 # Todo
 
+- use const
+
 - automate planning
+  - auto recreate tasks
 - check status before operate
 
 - GPIO logic

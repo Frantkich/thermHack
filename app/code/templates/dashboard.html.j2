@@ -1,4 +1,4 @@
-{% extends "components/base.html" %}
+{% extends "components/base.html.j2" %}
 {% block content %}
 <div class="row">
     <!-- Controler -->
@@ -43,6 +43,25 @@
         </div>
     </div>
 
+    <dialog class="dialog" id="planning_edit_task">
+        <div class="dialog-header">
+            <h1 class="dialog-title" id="planning_edit_tasks_title">Dialog title</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="dialog" aria-label="Close"></button>
+        </div>
+        <div class="dialog-body">
+            <form class="d-flex flex-column gap-3 p-3">
+                <label for="planning_edit_tasks_start" class="form-label">Start thermostat</label>
+                <input type="time" id="planning_edit_tasks_start" class="form-control" aria-label="Time picker" value="">
+                <label for="planning_edit_tasks_stop" class="form-label">stop thermostat</label>
+                <input type="time" id="planning_edit_tasks_stop" class="form-control" aria-label="Time picker" value="">
+            </form>
+        </div>
+        <div class="dialog-footer">
+            <button type="button" class="btn-solid theme-secondary" data-bs-dismiss="dialog">Close</button>
+            <button type="button" id="planning_edit_tasks_save" class="btn-solid theme-primary">Save changes</button>
+        </div>
+    </dialog>
+
     <!-- Motor Log -->
     <div class="col-md-6 mb-4">
         <div class="card h-100">
@@ -68,7 +87,9 @@
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <script type="module" src="{{ url_for('static', filename='js/dashboard.js' )}}"></script>
-
-    {% endblock %}
+{% block javascript_import %}
+<script type="module" src="{{ url_for('static', filename='js/dashboard.js' )}}"></script>
+{% endblock %}

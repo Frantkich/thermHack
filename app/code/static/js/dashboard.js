@@ -5,7 +5,7 @@ console.log("dashboard.js loaded")
 // ============ Status
 
 async function fetchThermostatStatus() {
-    var status_btn = document.getElementById("therm_status_btn");
+    let status_btn = document.getElementById("therm_status_btn");
     status_btn.disabled = true;
     status_btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
     try {
@@ -21,12 +21,12 @@ async function fetchThermostatStatus() {
 }
 
 function updateStatus(status) {
-    var status_ico = document.getElementById("therm_status_ico");
-    var status_txt = document.getElementById("therm_status_txt");
-    var status_btn = document.getElementById("therm_status_btn");
+    let status_ico = document.getElementById("therm_status_ico");
+    let status_txt = document.getElementById("therm_status_txt");
+    let status_btn = document.getElementById("therm_status_btn");
     // remove all eventListener (try something cleaner)
     status_btn.parentNode.replaceChild(status_btn.cloneNode(true), status_btn);
-    var status_btn = document.getElementById("therm_status_btn");
+    status_btn = document.getElementById("therm_status_btn");
     switch (status) {
         case "on":
             status_ico.className = "bi bi-fire";
@@ -71,7 +71,7 @@ async function operateThermostat(action) {
 // ============ Logs
 
 async function fetchLastLogs() {
-    var logs_count = 10;
+    let logs_count = 10;
     try {
         const res = await fetch(`/api/actionslogs?count=${logs_count}`, { method: "GET" });
         const data = await res.json();
@@ -89,17 +89,17 @@ async function fetchLastLogs() {
 }
 
 function updateLogsEntries(logs) {
-    var table_logs = document.getElementById("motor_logs").getElementsByTagName("tbody")[0];
+    let table_logs = document.getElementById("motor_logs").getElementsByTagName("tbody")[0];
     table_logs.innerHTML = "";
     logs.forEach(log => {
-        var row = document.createElement("tr");
+        let row = document.createElement("tr");
         // Date
-        var cell_date = document.createElement("td");
+        let cell_date = document.createElement("td");
         cell_date.innerText = new Date(log.timestamp).toLocaleString();
         row.appendChild(cell_date);
         // Action
-        var cell_action = document.createElement("td");
-        var cell_action_ico = document.createElement("i");
+        let cell_action = document.createElement("td");
+        let cell_action_ico = document.createElement("i");
         cell_action.appendChild(cell_action_ico);
         if (log.action == "on") {
             cell_action_ico.className = "bi bi-fire"
@@ -110,8 +110,8 @@ function updateLogsEntries(logs) {
         }
         row.appendChild(cell_action);
         // Status
-        var cell_status = document.createElement("td");
-        var cell_status_ico = document.createElement("i");
+        let cell_status = document.createElement("td");
+        let cell_status_ico = document.createElement("i");
         cell_status.appendChild(cell_status_ico);
         if (log.status == log.action) {
             cell_status_ico.className = "bi bi-check-circle"
@@ -122,7 +122,7 @@ function updateLogsEntries(logs) {
         }
         row.appendChild(cell_status);
         // IP
-        var cell_ip = document.createElement("td");
+        let cell_ip = document.createElement("td");
         cell_ip.innerText = log.ip_address;
         row.appendChild(cell_ip);
 
@@ -134,7 +134,8 @@ function updateLogsEntries(logs) {
 
 async function fetchPlanning() {
     try {
-        const res = await fetch(`/api/tasks`, { method: "GET" });
+        let tasks_count = 14;
+        const res = await fetch(`/api/tasks?count=${tasks_count}`, { method: "GET" });
         const data = await res.json();
         if (data.data.length) {
             if (document.getElementById("planning_fetching_row") != null) {
@@ -150,31 +151,34 @@ async function fetchPlanning() {
 }
 
 function updatePlanning(tasks) {
-    var table_planning = document.getElementById("planning").getElementsByTagName("tbody")[0];
+    let table_planning = document.getElementById("planning").getElementsByTagName("tbody")[0];
     table_planning.innerHTML = "";
     tasks.forEach(task => {
-        var cell_execution_hour_classname = "";
-        var id_group = task.id.split("-")[0];
-        var row = document.getElementById(id_group);
+        let cell_execution_hour_classname = "";
+        let id_group = task.id.split("-")[0];
+        let row = document.getElementById(id_group);
         if (row == null) {
             row = document.createElement("tr");
             row.id = id_group;
             // Date
-            var cell_day = document.createElement("td");
+            let cell_day = document.createElement("td");
             cell_day.innerText = task.day;
             row.appendChild(cell_day);
             // Start/End
-            var cell_start = document.createElement("td");
+            let cell_start = document.createElement("td");
             cell_start.className = "start";
             row.appendChild(cell_start);
-            var cell_end = document.createElement("td");
-            cell_end.className = "end";
+            let cell_end = document.createElement("td");
+            cell_end.className = "stop";
             row.appendChild(cell_end);
             // Edit button
-            var cell_edit = document.createElement("td");
-            var edit_ico = document.createElement("div");
+            let cell_edit = document.createElement("td");
+            let edit_ico = document.createElement("div");
             edit_ico.className = "bi bi-pencil-square";
-            edit_ico.addEventListener("click", () => console.log("edit"));
+            edit_ico.setAttribute("type", "button");
+            edit_ico.setAttribute("data-bs-toggle", "dialog");
+            edit_ico.setAttribute("data-bs-target", "#planning_edit_task");
+            edit_ico.addEventListener("click", () => fillEditPlanning(task.id, row));
             cell_edit.appendChild(edit_ico);
             row.appendChild(cell_edit);
         }
@@ -183,20 +187,27 @@ function updatePlanning(tasks) {
                 cell_execution_hour_classname = "start";
                 break;
             case "thermostat_off":
-                cell_execution_hour_classname = "end";
+                cell_execution_hour_classname = "stop";
                 break;
             default:
                 break;
         }
-        var cell_execution_hour = row.getElementsByClassName(cell_execution_hour_classname)[0];
+        let cell_execution_hour = row.getElementsByClassName(cell_execution_hour_classname)[0];
         cell_execution_hour.innerText = task.execution;
         table_planning.appendChild(row);
     });
 }
 
-function editPlanning(task_day) {
+function fillEditPlanning(task_id, row_el) {
+    let task_date = task_id.split("-")[0];
+    document.getElementById("planning_edit_tasks_title").innerText = `Editing schedule for ${task_date.slice(6, 2)}/${task_date.slice(4, 2)}`;
+
+    document.getElementById("planning_edit_tasks_start").setAttribute("value", row_el.getElementsByClassName("start")[0].innerText);
+    document.getElementById("planning_edit_tasks_stop").setAttribute("value", row_el.getElementsByClassName("stop")[0].innerText);
 
 }
+
+
 
 fetchThermostatStatus();
 fetchLastLogs();

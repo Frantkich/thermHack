@@ -27,7 +27,7 @@ def login():
         provided_token = request.form.get("token")
         if not provided_token:
             flash("Token missing !", "error")
-            return render_template("login.html")
+            return render_template("login.html.j2")
         
         if check_token_valid(provided_token):
             resp = make_response(redirect(url_for("frontend.dashboard")))
@@ -41,7 +41,7 @@ def login():
             return resp
         else:
             flash("Invalid token", "warning")
-    return render_template("login.html")
+    return render_template("login.html.j2")
 
 @front_bp.route("/logout")
 def logout():
@@ -52,7 +52,7 @@ def logout():
 @front_bp.route("/dashboard")
 @token_required
 def dashboard():
-    return render_template("dashboard.html")
+    return render_template("dashboard.html.j2")
 
 @front_bp.route("/api/logs")
 @token_required

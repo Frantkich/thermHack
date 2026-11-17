@@ -21,6 +21,7 @@
     <div class="container mt-5">
         {% block content %}{% endblock %}
     </div>
+    {% block javascript_import %}{% endblock %}
     <script type="module" src="{{ url_for('static', filename='libs/bootstrap.bundle.min.js' )}}" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
 </body>
 

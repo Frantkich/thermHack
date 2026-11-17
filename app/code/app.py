@@ -15,8 +15,8 @@ app.config.from_object(Config)
 
 limiter.app = app
 
-csp = {"default-src": "'self'", "script-src": ["'self'", "'unsafe-inline'"], "style-src": ["'self'", "'unsafe-inline'"]}
-Talisman(app, force_https=False, content_security_policy=csp) 
+# csp = {"default-src": "'self'", "script-src": ["'self'", "'unsafe-inline'"], "style-src": ["'self'", "'unsafe-inline'"]}
+# Talisman(app, force_https=False, content_security_policy=csp) 
 
 db.init_app(app)
 
