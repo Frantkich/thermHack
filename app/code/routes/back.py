@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from db import helpers as db_helpers
 from tasks import helpers as tasks_helpers
@@ -67,9 +67,9 @@ def get_tasks():
         "data": [{
             "id": task["id"],
             "name": task["name"],
-            "day": f"{task["date"].strftime('%a')} {task["date"].day}/{task["date"].month}",
-            "execution": f"{task["date"].hour}:{task["date"].minute}"
-        } for task in tasks_helpers.get_tasks()]
+            "day": task["date"].strftime("%a %m/%d"),
+            "execution": task["date"].strftime("%H:%M")
+        } for task in tasks_helpers.get_tasks() if task["date"] > datetime.now(timezone.utc)]
     }), 200
 
 
@@ -77,6 +77,18 @@ def get_tasks():
 @back_bp.route("/tasks", methods=["POST"])
 @token_required
 def add_task():
-    alarm_time = datetime.now() + timedelta(seconds=3600)
-    tasks_helpers.add_task("off", alarm_time)
-    return "okay", 200
+    tasks_helpers.add_task("on", datetime.now() + timedelta(days=-1))
+    tasks_helpers.add_task("off", datetime.now() + timedelta(days=-1, hours=1))
+
+    tasks_helpers.add_task("on", datetime.now() + timedelta(seconds=1700))
+    tasks_helpers.add_task("off", datetime.now() + timedelta(seconds=3600))
+
+    tasks_helpers.add_task("on", datetime.now() + timedelta(days=1))
+    tasks_helpers.add_task("off", datetime.now() + timedelta(days=1, hours=1))
+
+    
+    tasks_helpers.add_task("on", datetime.now() + timedelta(days=2))
+    
+    tasks_helpers.add_task("off", datetime.now() + timedelta(days=3))
+
+    return "tasks added", 200
