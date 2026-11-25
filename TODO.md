@@ -1,7 +1,9 @@
 # Todo
 
-- automate planning
-  - auto recreate tasks
+- edit task date
+
+- auto recreate default tasks (custom default hours)
+
 - check status before operate
 
 - GPIO logic
@@ -10,4 +12,5 @@
 
 - token error - login page
 - width card html
+
 - remove TODO comment for dev

@@ -73,6 +73,16 @@ def get_tasks():
     }), 200
 
 
+@back_bp.route("/tasks", methods=["PATCH"])
+@token_required
+def edit_tasks():
+
+    return "", 200
+
+
+
+
+
 # REMOVE
 @back_bp.route("/tasks", methods=["POST"])
 @token_required

@@ -223,8 +223,12 @@ function fillEditPlanning(task_id, row_el) {
     document.getElementById("planning_edit_tasks_start").setAttribute("value", row_el.getElementsByClassName("start")[0].innerText);
     document.getElementById("planning_edit_tasks_stop").setAttribute("value", row_el.getElementsByClassName("stop")[0].innerText);
 
+    document.getElementById("planning_edit_tasks_save").setAttribute("onclick", task_id);
 }
 
+function editTask(task_id) {
+    console.log(task_id);
+}
 
 fetchThermostatStatus();
 fetchLastLogs();
