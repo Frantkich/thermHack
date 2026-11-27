@@ -4,7 +4,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 from db.db import db
-from db.models import Log, Token
+from db.models import Token
 from tools.token import hash_token, check_token_valid
 from tools.decorators import token_required
 
@@ -13,9 +13,11 @@ front_bp = Blueprint("frontend", __name__,)
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["100 per minute"], storage_uri="memory://")
 
+
 @front_bp.route("/")
 def index():
     return redirect(url_for("frontend.dashboard"))
+
 
 @limiter.limit("5 per minute")
 @front_bp.route("/login", methods=["GET", "POST"])
@@ -43,28 +45,19 @@ def login():
             flash("Invalid token", "warning")
     return render_template("login.html.j2")
 
+
 @front_bp.route("/logout")
 def logout():
     resp = make_response(redirect(url_for("frontend.login")))
     resp.delete_cookie("auth_token")
     return resp
 
+
 @front_bp.route("/dashboard")
 @token_required
 def dashboard():
     return render_template("dashboard.html.j2")
 
-@front_bp.route("/api/logs")
-@token_required
-def get_all_logs():
-    logs = Log.query.order_by(Log.timestamp.desc()).limit(100).all()
-    return jsonify([{
-        "timestamp": l.timestamp.isoformat(),
-        "ip": l.ip_address,
-        "action": l.action,
-        "status": l.status,
-        "error": l.error_message
-    } for l in logs])
 
 @front_bp.route("/setup-token", methods=["POST"])
 def setup_initial_token():

@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from datetime import datetime, timedelta, timezone
 
 from db import helpers as db_helpers
-from tasks import helpers as tasks_helpers
+from jobs import helpers as jobs_helpers
 from hardware import helpers as hw_helpers
 from tools.decorators import token_required
 
@@ -37,7 +37,7 @@ def operateThermostat(action):
         resp_code = 500
     return jsonify({"status": status, "message": msg}), resp_code
 
-@back_bp.route("/actionslogs", methods=["GET"])
+@back_bp.route("/logs", methods=["GET"])
 @token_required
 def get_action_logs():
     count = request.args.get("count") if "count" in request.args else 10
@@ -59,46 +59,62 @@ def get_action_logs():
         return jsonify({"status": status, "message": msg}), resp_code
 
 
-@back_bp.route("/tasks", methods=["GET"])
+@back_bp.route("/jobs", methods=["GET"])
 @token_required
-def get_tasks():
+def get_jobs():
+    today_date = datetime.now(timezone.utc)
+    today_day_start = datetime(today_date.year, today_date.month, today_date.day, tzinfo=timezone.utc)
     return jsonify({
         "status": "sucess",
         "data": [{
-            "id": task["id"],
-            "name": task["name"],
-            "day": task["date"].strftime("%a %m/%d"),
-            "execution": task["date"].strftime("%H:%M")
-        } for task in tasks_helpers.get_tasks() if task["date"] > datetime.now(timezone.utc)]
+            "id": job["id"],
+            "name": job["name"],
+            "day": job["date"].strftime("%a %d/%m"),
+            "execution": job["date"].strftime("%H:%M")
+        } for job in jobs_helpers.get_jobs() if job["date"] > today_day_start]
     }), 200
 
 
-@back_bp.route("/tasks", methods=["PATCH"])
+@back_bp.route("/jobs", methods=["PATCH"])
 @token_required
-def edit_tasks():
+def edit_jobs():
+    results = []
+    for job in request.json:
+        job_id = job["id"]
+        if job["execution_hour"]:
+            job_date = datetime(
+                year=int(job_id[0:4]),
+                month=int(job_id[4:6]),
+                day=int(job_id[6:8]),
+                hour=int(job["execution_hour"][0:2]),
+                minute=int(job["execution_hour"][3:5]),
+            )
+            results.append(jobs_helpers.edit_job(job_id, job_date))
+        else:
+            results.append(jobs_helpers.cancel_job(job_id))
 
-    return "", 200
-
-
-
+    if results.count("ok") == len(request.json):
+        return jsonify({"status": "ok"}), 200
+    else:
+        return jsonify({"status": "failed"}), 500
 
 
 # REMOVE
-@back_bp.route("/tasks", methods=["POST"])
+@back_bp.route("/jobs", methods=["POST"])
 @token_required
-def add_task():
-    tasks_helpers.add_task("on", datetime.now() + timedelta(days=-1))
-    tasks_helpers.add_task("off", datetime.now() + timedelta(days=-1, hours=1))
+def add_job():
+    jobs_helpers.add_job("on", datetime.now() + timedelta(days=-1))
+    jobs_helpers.add_job("off", datetime.now() + timedelta(days=-1, hours=1))
 
-    tasks_helpers.add_task("on", datetime.now() + timedelta(seconds=1700))
-    tasks_helpers.add_task("off", datetime.now() + timedelta(seconds=3600))
+    jobs_helpers.add_job("on", datetime.now() + timedelta(seconds=1700))
+    jobs_helpers.add_job("off", datetime.now() + timedelta(seconds=3600))
 
-    tasks_helpers.add_task("on", datetime.now() + timedelta(days=1))
-    tasks_helpers.add_task("off", datetime.now() + timedelta(days=1, hours=1))
+    jobs_helpers.add_job("on", datetime.now() + timedelta(days=1))
+    jobs_helpers.add_job("off", datetime.now() + timedelta(days=1, hours=1))
 
     
-    tasks_helpers.add_task("on", datetime.now() + timedelta(days=2))
+    jobs_helpers.add_job("on", datetime.now() + timedelta(days=2))
     
-    tasks_helpers.add_task("off", datetime.now() + timedelta(days=3))
+    jobs_helpers.add_job("off", datetime.now() + timedelta(days=3))
 
-    return "tasks added", 200
+    return "jobs added", 200

@@ -82,7 +82,7 @@ async function fetchLastLogs() {
     let data;
     try {
         const logs_count = 10;
-        const res = await fetch(`/api/actionslogs?count=${logs_count}`, { method: "GET" });
+        const res = await fetch(`/api/logs?count=${logs_count}`, { method: "GET" });
         data = await res.json();
     } catch (e) {
         console.warn("Failed to fetch action logs !");
@@ -148,8 +148,8 @@ async function fetchPlanning() {
     const planning_fetching_row = document.getElementById("planning_fetching_row");
     let data;
     try {
-        const tasks_count = 14;
-        const res = await fetch(`/api/tasks?count=${tasks_count}`, { method: "GET" });
+        const jobs_count = 14;
+        const res = await fetch(`/api/jobs?count=${jobs_count}`, { method: "GET" });
         data = await res.json();
     } catch (e) {
         console.warn("Failed to fetch planning !");
@@ -168,19 +168,19 @@ async function fetchPlanning() {
     }
 }
 
-function updatePlanning(tasks) {
+function updatePlanning(jobs) {
     const table_planning = document.getElementById("planning").getElementsByTagName("tbody")[0];
     table_planning.innerHTML = "";
-    tasks.forEach(task => {
+    jobs.forEach(job => {
         let cell_execution_hour_classname = "";
-        const id_group = task.id.split("-")[0];
+        const id_group = job.id.split("-")[0];
         let row = document.getElementById(id_group);
         if (row == null) {
             row = document.createElement("tr");
             row.id = id_group;
             // Date
             const cell_day = document.createElement("td");
-            cell_day.innerText = task.day;
+            cell_day.innerText = job.day;
             row.appendChild(cell_day);
             // Start/End
             const cell_start = document.createElement("td");
@@ -195,12 +195,12 @@ function updatePlanning(tasks) {
             edit_ico.className = "bi bi-pencil-square";
             edit_ico.setAttribute("type", "button");
             edit_ico.setAttribute("data-bs-toggle", "dialog");
-            edit_ico.setAttribute("data-bs-target", "#planning_edit_task");
-            edit_ico.addEventListener("click", () => fillEditPlanning(task.id, row));
+            edit_ico.setAttribute("data-bs-target", "#planning_edit_job");
+            edit_ico.addEventListener("click", () => fillEditPlanning(id_group, row));
             cell_edit.appendChild(edit_ico);
             row.appendChild(cell_edit);
         }
-        switch (task.name) {
+        switch (job.name) {
             case "thermostat_on":
                 cell_execution_hour_classname = "start";
                 break;
@@ -208,26 +208,58 @@ function updatePlanning(tasks) {
                 cell_execution_hour_classname = "stop";
                 break;
             default:
-                throw new Error(`Task name (=${task.name}) not handled!`);;
+                throw new Error(`job name (=${job.name}) not handled!`);;
         }
         const cell_execution_hour = row.getElementsByClassName(cell_execution_hour_classname)[0];
-        cell_execution_hour.innerText = task.execution;
+        cell_execution_hour.innerText = job.execution;
+        cell_execution_hour.value = job.id;
         table_planning.appendChild(row);
     });
 }
 
-function fillEditPlanning(task_id, row_el) {
-    const task_date = task_id.split("-")[0];
-    document.getElementById("planning_edit_tasks_title").innerText = `Editing schedule for ${task_date.slice(6, 2)}/${task_date.slice(4, 2)}`;
+function fillEditPlanning(job_date, row_el) {
+    document.getElementById("planning_edit_job_title").innerText = `Editing schedule for ${job_date.slice(6, 8)}/${job_date.slice(4, 6)}`;
 
-    document.getElementById("planning_edit_tasks_start").setAttribute("value", row_el.getElementsByClassName("start")[0].innerText);
-    document.getElementById("planning_edit_tasks_stop").setAttribute("value", row_el.getElementsByClassName("stop")[0].innerText);
+    const job_start = row_el.getElementsByClassName("start")[0];
+    const planning_edit_job_start = document.getElementById("planning_edit_job_start");
+    planning_edit_job_start.value = job_start.innerText;
 
-    document.getElementById("planning_edit_tasks_save").setAttribute("onclick", task_id);
+    const job_stop = row_el.getElementsByClassName("stop")[0];
+    const planning_edit_job_stop = document.getElementById("planning_edit_job_stop");
+    planning_edit_job_stop.value = job_stop.innerText;
+
+    let planning_edit_job_save = document.getElementById("planning_edit_job_save");
+    planning_edit_job_save.parentNode.replaceChild(planning_edit_job_save.cloneNode(true), planning_edit_job_save);
+    planning_edit_job_save = document.getElementById("planning_edit_job_save");
+
+    planning_edit_job_save.addEventListener("click", () => submitEditPlaning([[job_start.value, planning_edit_job_start.value], [job_stop.value, planning_edit_job_stop.value]]));
 }
 
-function editTask(task_id) {
-    console.log(task_id);
+async function submitEditPlaning(jobs) {
+
+    if (await editjob(jobs) == "ok") {
+        fetchPlanning();
+        document.getElementById("planning_edit_job").close();
+        document.getElementById("planning_edit_job_start").value = "";
+        document.getElementById("planning_edit_job_stop").value = "";
+    }
+}
+
+async function editjob(jobs) {
+    let data;
+    try {
+        const res = await fetch(`/api/jobs`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(jobs.map(job => ({ "id": job[0], "execution_hour": job[1] }))),
+        });
+        data = await res.json();
+        return data.status;
+    } catch (e) {
+        console.warn("Failed to edit job execution hours !");
+        console.warn(e);
+        return;
+    }
 }
 
 fetchThermostatStatus();

@@ -1,10 +1,6 @@
 # Todo
 
-- edit task date
-
-- auto recreate default tasks (custom default hours)
-
-- check status before operate
+- auto recreate default jobs (custom default hours)
 
 - <https://github.com/agronholm/apscheduler/tree/master/examples/separate_worker>
 

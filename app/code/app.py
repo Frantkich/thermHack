@@ -4,7 +4,7 @@ from flask_talisman import Talisman
 
 from config import Config
 from db.db import db
-from tasks.task import scheduler
+from jobs.job import scheduler
 
 from routes.front import front_bp, limiter
 from routes.back import back_bp
