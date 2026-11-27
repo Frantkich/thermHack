@@ -8,7 +8,7 @@ services:
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
       - MARIADB_RANDOM_ROOT_PASSWORD=1
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
       start_period: 15s
       interval: 10s
       timeout: 5s
@@ -32,6 +32,8 @@ services:
       - MARIADB_USER=user
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
       - TZ=Europe/Paris
+      - GPIOZERO_PIN_FACTORY=native
+      - CRTL_PIN=17
       - INIT_SECRET=CHANGE_ME_NOW #REMOVE
     networks:
       - db
@@ -39,9 +41,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    ports: #REMOVE
+    group_add:
+      - keep-groups
+    devices:
+      - /dev/gpiochip0:/dev/gpiochip0
+      - /dev/gpiochip1:/dev/gpiochip1
+      - /dev/gpiomem:/dev/gpiomem
+    ports:
+      #REMOVE
       - 8000:8000
-    volumes: #REMOVE
+    volumes:
+      #REMOVE
       - ./app/code:/code
 
 networks:

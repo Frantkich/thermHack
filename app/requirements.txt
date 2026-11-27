@@ -5,3 +5,4 @@ Flask-SQLAlchemy==3.*
 PyMySQL==1.*
 gunicorn==27.*
 APScheduler==3.*
+gpiozero==2.*

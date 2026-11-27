@@ -5,53 +5,53 @@ console.log("dashboard.js loaded")
 // ============ Status
 
 async function fetchThermostatStatus() {
-    let status_btn = document.getElementById("therm_status_btn");
-    status_btn.disabled = true;
-    status_btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+    let therm_status_btn = document.getElementById("therm_status_btn");
+    therm_status_btn.disabled = true;
+    therm_status_btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
     let data;
     try {
         const res = await fetch(`/api/thermostat`, { method: "GET" });
         data = await res.json();
     } catch (e) {
         console.warn("Failed to retrieve thermostat status !");
-        status_btn.disabled = false;
+        therm_status_btn.disabled = false;
         updateStatus("failed");
         return;
     }
-    status_btn = updateStatus(data.status);
-    status_btn.disabled = false;
+    therm_status_btn = updateStatus(data.status);
+    therm_status_btn.disabled = false;
 }
 
 function updateStatus(status) {
     const status_ico = document.getElementById("therm_status_ico");
     const status_txt = document.getElementById("therm_status_txt");
-    let status_btn = document.getElementById("therm_status_btn");
+    let therm_status_btn = document.getElementById("therm_status_btn");
     // remove all eventListener (try something cleaner)
-    status_btn.parentNode.replaceChild(status_btn.cloneNode(true), status_btn);
-    status_btn = document.getElementById("therm_status_btn");
+    therm_status_btn.parentNode.replaceChild(therm_status_btn.cloneNode(true), therm_status_btn);
+    therm_status_btn = document.getElementById("therm_status_btn");
     switch (status) {
         case "on":
             status_ico.className = "bi bi-fire";
             status_ico.style.color = "#c94a24"
             status_txt.innerText = "ON";
-            status_btn.innerText = "Turn off";
-            status_btn.addEventListener("click", () => operateThermostat("off"));
+            therm_status_btn.innerText = "Turn off";
+            therm_status_btn.addEventListener("click", () => operateThermostat("off"));
             break
         case "off":
             status_ico.className = "bi bi-snow";
             status_ico.style.color = "#20a1aa"
             status_txt.innerText = "OFF";
-            status_btn.innerText = "Turn on";
-            status_btn.addEventListener("click", () => operateThermostat("on"));
+            therm_status_btn.innerText = "Turn on";
+            therm_status_btn.addEventListener("click", () => operateThermostat("on"));
             break
         default:
             status_ico.className = "bi bi-arrow-clockwise";
             status_txt.innerText = "Unknown";
-            status_btn.innerText = "Recheck status";
-            status_btn.addEventListener("click", fetchThermostatStatus);
+            therm_status_btn.innerText = "Recheck status";
+            therm_status_btn.addEventListener("click", fetchThermostatStatus);
             break
     }
-    return status_btn;
+    return therm_status_btn;
 
 }
 
@@ -63,14 +63,14 @@ async function operateThermostat(action) {
     let data;
     try {
         const res = await fetch(`/api/thermostat/${action}`, { method: "POST" });
-        const data = await res.json();
+        data = await res.json();
     } catch (e) {
         console.warn("Failed to operate thermostat !");
-        status_btn = updateStatus("failed")
-        therm_status_btn.disabled = false;
+        therm_status_btn = updateStatus("failed")
+        therm_therm_status_btn.disabled = false;
         return;
     }
-    status_btn = updateStatus(data.status);
+    therm_status_btn = updateStatus(data.status);
     await fetchLastLogs();
     therm_status_btn.disabled = false;
 }
